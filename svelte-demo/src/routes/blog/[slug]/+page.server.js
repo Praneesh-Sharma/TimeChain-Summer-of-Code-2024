@@ -1,7 +1,20 @@
-export async function load({params}){
-    
-    // const data = $(params.slug)
-    return {
-        content: `hello ${params.slug}`
-    }
+import { sql } from "@vercel/postgres";
+import { createClient } from '@vercel/postgres';
+ 
+async function queryNames() {
+  const client = createClient();
+  await client.connect();
+  
+  try {
+    const names = await client.sql`SELECT * FROM posts NAMES;`;
+    return names;
+  } finally {
+    await client.end();
+  }
+}
+
+export async function load({ locals }) {
+  return {
+    names: await queryNames()
+  }
 }
